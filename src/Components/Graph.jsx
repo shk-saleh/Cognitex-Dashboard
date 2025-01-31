@@ -39,7 +39,7 @@ const Graph = () => {
             ]}
             xAxis={[{ data: xLabels, scaleType: 'band' }]}
             sx={{
-              [`& .MuiChartsAxis-tickLabel`]: { fill: '#ffff' },
+              [`& .MuiChartsAxis-tickLabel`]: { fill: '#ffff !important' },
             }}
           />
         </div>
