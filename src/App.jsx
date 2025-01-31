@@ -4,6 +4,7 @@ import Header from "./Components/Header";
 import StatsCard from "./Components/StatsCard";
 import Graph from "./Components/Graph";
 import { SliderCard } from "./Components/SliderCard";
+import GuageCard from "./Components/GuageCard";
 
 
 const App = () => {
@@ -28,12 +29,13 @@ const App = () => {
         <Header onFilterChange={(e) => console.log(e.target.value)} />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard title="Active Conversations" progressVal="5"  value="5" label="+5.00%" />
-          <StatsCard title="Avg Response time" progressVal="15"  value="20s" label="+5.00%"/>
-          <SliderCard title="Customer Satisfaction" progressVal="15"  value="90%" />
+          <StatsCard title="Avg Response time" progressVal="20"  value="20s" label="+5.00%"/>
+          <SliderCard title="Customer Satisfaction" progressVal="90"  value="90%" />
+          <GuageCard title="Total Interactions" progressVal1="15" progressVal2="50" value1="Chats" value2="Calls" />
         </div>
-        {/* <div>
+        <div>
           <Graph/>
-        </div> */}
+        </div>
       </main>
 
       {/* Rest of the dashboard content remains the same */}
