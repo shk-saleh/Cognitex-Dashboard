@@ -29,10 +29,10 @@ const Graph = () => {
               <option>Year</option>
             </select>
         </div>
-        <div className="h-64">
+        <div className="h-[250px]">
           <BarChart
             width={500}
-            height={300}
+            height={290}
             series={[
               { data: pData, label: 'pv', id: 'pvId', stack: 'total' },
               { data: uData, label: 'uv', id: 'uvId', stack: 'total' },
