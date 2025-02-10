@@ -1,5 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Box, Phone, Globe, HelpCircle, ArrowLeft, ArrowRight, Upload, Link as LinkIcon, Plus, ChevronDown } from 'lucide-react';
+import { Box, Phone, Globe, HelpCircle, ArrowLeft, ArrowRight, Upload, Link as LinkIcon, Plus, ChevronDown ,X } from 'lucide-react';
+// import { Box, Phone, Globe, HelpCircle, ArrowLeft, ArrowRight, Upload, Link as LinkIcon, Plus, ChevronDown, X } from 'lucide-react';
+import {  Search, MoreVertical } from 'lucide-react';
+// import { useToast } from "@/components/ui/use-toast";
+// import { Toaster } from "@/components/ui/toaster";
 
 const Tooltip = ({ isVisible }) => {
   if (!isVisible) return null;
@@ -132,7 +136,7 @@ const FAQSection = () => {
 
 
 
-const BehaviorSettingsForm = ({ onBack }) => {
+const BehaviorSettingsForm = ({ onBack, onFinish  }) => {
   const [fallbackResponses, setFallbackResponses] = useState([
     { user: "Can you transfer me to a live agent?", bot: "Currently, I'm unable to connect you to a live agent" }
   ]);
@@ -155,8 +159,11 @@ const BehaviorSettingsForm = ({ onBack }) => {
             <ArrowLeft size={20} className="text-gray-400" />
           </button>
           <h2 className="text-xl font-semibold text-white">Behavior Settings</h2>
-          <button className="p-2 rounded-full bg-[#1c3033] hover:bg-[#2a4447] transition-colors">
-            <ArrowRight size={20} className="text-gray-400" />
+          <button 
+            onClick={onFinish}
+            className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            Finish
           </button>
         </div>
 
@@ -362,6 +369,58 @@ const InformationForm = ({ onBack, onNext }) => {
 };
 
 
+const AgentsTable = ({ agents, onCreateClick }) => {
+  return (
+    <div className="w-full">
+      <div className="flex justify-between items-center mb-6">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <input 
+            type="text"
+            placeholder="Search..."
+            className="bg-[#1c3033] text-white pl-10 pr-4 py-2 rounded-lg w-[200px] focus:outline-none"
+          />
+        </div>
+        <button 
+          onClick={onCreateClick}
+          className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+        >
+          Create Agent
+        </button>
+      </div>
+
+      <div className="w-full overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-[#1c3033]">
+              <th className="text-left py-4 px-4 text-gray-400 font-normal">Agent Name</th>
+              <th className="text-left py-4 px-4 text-gray-400 font-normal">Voice</th>
+              <th className="text-left py-4 px-4 text-gray-400 font-normal">Phone</th>
+              <th className="text-left py-4 px-4 text-gray-400 font-normal">Edited by</th>
+              <th className="w-10"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {agents.map((agent, index) => (
+              <tr key={index} className="border-b border-[#1c3033] hover:bg-[#1c3033]/30 transition-colors">
+                <td className="py-4 px-4 text-white">{agent.name}</td>
+                <td className="py-4 px-4 text-white">{agent.voice}</td>
+                <td className="py-4 px-4 text-white">{agent.phone || '-'}</td>
+                <td className="py-4 px-4 text-white">{agent.editedBy}</td>
+                <td className="py-4 px-4">
+                  <button className="p-1 hover:bg-[#2a4447] rounded-full transition-colors">
+                    <MoreVertical size={20} className="text-gray-400" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
 
 const NoAgentsView = ({ onCreateClick }) => {
   return (
@@ -382,8 +441,23 @@ const NoAgentsView = ({ onCreateClick }) => {
   );
 };
 
+
 const Agents = () => {
-  const [agents] = useState([]);
+  const [showToast, setShowToast] = useState(false);
+  const [agents] = useState([
+    {
+      name: 'Call Center',
+      voice: 'Ava',
+      phone: '-',
+      editedBy: '22/01/2025'
+    },
+    {
+      name: 'Customer Support',
+      voice: 'Emma',
+      phone: '+1234567890',
+      editedBy: '21/01/2025'
+    }
+  ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
   const [currentStep, setCurrentStep] = useState('type'); // 'type', 'info', 'customization'
@@ -391,6 +465,29 @@ const Agents = () => {
   const handleCreateClick = () => {
     setIsModalOpen(true);
   };
+
+  if (!isModalOpen) {
+    return (
+      <div className="flex-1 min-h-screen bg-[#0B0E0F] p-8">
+        {agents.length === 0 ? (
+          <NoAgentsView onCreateClick={handleCreateClick} />
+        ) : (
+          <AgentsTable agents={agents} onCreateClick={handleCreateClick} />
+        )}
+        {showToast && (
+          <div className="fixed top-4 right-4 flex items-center gap-2 bg-[#1c3033] border border-[#2a4447] text-white px-4 py-3 rounded-lg shadow-lg animate-fade-in">
+            <span>You will be notified on agent creation</span>
+            <button 
+              onClick={() => setShowToast(false)}
+              className="p-1 hover:bg-[#2a4447] rounded-full transition-colors"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -416,38 +513,57 @@ const Agents = () => {
       setCurrentStep('behavior');
     }
   };
-
+ 
+  const handleFinish = () => {
+    setShowToast(true);
+    handleCloseModal();
+    // Auto hide toast after 3 seconds
+    setTimeout(() => {
+      setShowToast(false);
+    }, 3000);
+  };
   const handleTypeSelect = (type) => {
     setSelectedType(type);
     setCurrentStep('info');
   };
 
-  if (!isModalOpen) {
-    return <NoAgentsView onCreateClick={handleCreateClick} />;
-  }
+  // if (!isModalOpen) {
+  //   return <NoAgentsView onCreateClick={handleCreateClick} />;
+  // }
 
   return (
     <div className="flex-1 min-h-screen bg-[#0B0E0F] p-8">
-      <div className="max-w-3xl mx-auto">
-        {currentStep === 'type' && (
-          <>
-            <h2 className="text-2xl font-semibold text-white mb-8 text-center">
-              Choose Integration Type
-            </h2>
-            <IntegrationTypeSelection onSelectType={handleTypeSelect} />
-          </>
-        )}
-        {currentStep === 'info' && (
-          <InformationForm onBack={handleBack} onNext={handleNext} />
-        )}
-        {currentStep === 'customization' && (
-          <CustomizationsForm onBack={handleBack} onNext={handleNext} />
-        )}
-        {currentStep === 'behavior' && (
-          <BehaviorSettingsForm onBack={handleBack} />
-        )}
-      </div>
+    <div className="max-w-3xl mx-auto">
+      {currentStep === 'type' && (
+        <>
+          <h2 className="text-2xl font-semibold text-white mb-8 text-center">
+            Choose Integration Type
+          </h2>
+          <IntegrationTypeSelection onSelectType={handleTypeSelect} />
+        </>
+      )}
+      {currentStep === 'info' && (
+        <InformationForm onBack={handleBack} onNext={handleNext} />
+      )}
+      {currentStep === 'customization' && (
+        <CustomizationsForm onBack={handleBack} onNext={handleNext} />
+      )}
+      {currentStep === 'behavior' && (
+        <BehaviorSettingsForm onBack={handleBack} onFinish={handleFinish} />
+      )}
     </div>
+    {showToast && (
+      <div className="fixed top-4 right-4 flex items-center gap-2 bg-[#1c3033] border border-[#2a4447] text-white px-4 py-3 rounded-lg shadow-lg animate-fade-in">
+        <span>You will be notified on agent creation</span>
+        <button 
+          onClick={() => setShowToast(false)}
+          className="p-1 hover:bg-[#2a4447] rounded-full transition-colors"
+        >
+          <X size={16} />
+        </button>
+      </div>
+    )}
+  </div>
   );
 };
 export default Agents;
